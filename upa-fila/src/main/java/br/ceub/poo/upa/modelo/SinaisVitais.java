@@ -53,11 +53,35 @@ public class SinaisVitais {
             throw new SinaisVitaisInvalidosException(
                     "Temperatura fora da faixa (30.0–45.0 °C): " + temperatura);
         }
-        // TODO: validar frequenciaCardiaca
-        // TODO: validar pressaoSistolica
-        // TODO: validar pressaoDiastolica (faixa E menor que a sistólica)
-        // TODO: validar saturacaoO2
-        // TODO: validar dor
+        if (frequenciaCardiaca < 20 || frequenciaCardiaca > 250) {
+            throw new SinaisVitaisInvalidosException(
+                    "Frequência cardíaca fora da faixa de 20 a 250 bpm: " + frequenciaCardiaca);
+        }
+
+        if (pressaoSistolica < 40 || pressaoSistolica > 300) {
+            throw new SinaisVitaisInvalidosException(
+                    "Pressão sistólica fora da faixa de 40 a 300 mmHg: " + pressaoSistolica);
+        }
+
+        if (pressaoDiastolica < 20 || pressaoDiastolica > 200) {
+            throw new SinaisVitaisInvalidosException(
+                    "Pressão diastólica fora da faixa de 20 a 200 mmHg: " + pressaoDiastolica);
+        }
+
+        if (pressaoDiastolica >= pressaoSistolica) {
+            throw new SinaisVitaisInvalidosException(
+                    "A pressão diastólica deve ser menor que a sistólica.");
+        }
+
+        if (saturacaoO2 < 50 || saturacaoO2 > 100) {
+            throw new SinaisVitaisInvalidosException(
+                    "Saturação fora da faixa de 50 a 100%: " + saturacaoO2);
+        }
+
+        if (dor < 0 || dor > 10) {
+            throw new SinaisVitaisInvalidosException(
+                    "Dor fora da escala de 0 a 10: " + dor);
+        }
     }
 
     public double getTemperatura() { return temperatura; }

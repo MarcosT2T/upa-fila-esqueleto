@@ -95,6 +95,8 @@ Resultados por etapa, obtidos no IntelliJ com os testes fornecidos no projeto.
 | 4 | `ClassificadorManchesterSimplificadoTest` | 6 de 6 aprovados |
 | 4 | `FilaPrioridadeTest` | 5 de 5 aprovados |
 | 4 | `PilhaTest` | 2 de 2 aprovados |
+| 5 | `BuscaTest` | 2 de 2 aprovados |
+| 5 | `OrdenacaoTest` | 5 de 5 aprovados |
 ---
 
 ## 🎬 Roteiro de demonstração
@@ -124,7 +126,7 @@ Resultados por etapa, obtidos no IntelliJ com os testes fornecidos no projeto.
 | Composição | `Paciente` guarda a `Triagem` recebida em `registrarTriagem()`. Cada `Atendimento` associa um paciente ao médico que o chamou. |
 | Exceções personalizadas | `FilaPrioridade.espiar()` e `Pilha.topo()` lançam `FilaVaziaException` quando a estrutura está vazia. |
 | Estruturas de dados | `FilaPrioridade.enfileirar()` insere cada nó na posição ordenada. `Pilha.empilhar()` e `desempilhar()` operam no topo, de modo que o último elemento inserido é o primeiro a sair. |
-
+| Recursão | `Busca.buscaBinariaRecursiva()` reduz a busca à metade que pode conter a chave. `Ordenacao.mergeSort()` ordena as duas metades recursivamente e `intercalar()` combina os resultados. |
 ---
 
 ## 🗂️ Estrutura do projeto

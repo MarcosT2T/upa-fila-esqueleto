@@ -48,9 +48,25 @@ public final class Busca {
      *   se chave < valorMeio → busque na metade ESQUERDA (inicio, meio - 1)
      *   senão                → busque na metade DIREITA  (meio + 1, fim)
      */
-    private static <T> int buscaBinariaRecursiva(List<T> lista, int chave, ToIntFunction<T> extratorChave,
-                                                 int inicio, int fim) {
-        // TODO
-        throw new UnsupportedOperationException("TODO: Busca.buscaBinariaRecursiva()");
+
+    private static <T> int buscaBinariaRecursiva(
+            List<T> lista, int chave, ToIntFunction<T> extratorChave, int inicio, int fim) {
+
+        if (inicio > fim) {
+            return -1;
+        }
+
+        int meio = inicio + (fim - inicio) / 2;
+        int valorMeio = extratorChave.applyAsInt(lista.get(meio));
+
+        if (chave == valorMeio) {
+            return meio;
+        }
+
+        if (chave < valorMeio) {
+            return buscaBinariaRecursiva(lista, chave, extratorChave, inicio, meio - 1);
+        }
+
+        return buscaBinariaRecursiva(lista, chave, extratorChave, meio + 1, fim);
     }
 }

@@ -31,27 +31,38 @@ public final class Ordenacao {
      *   Dica: new ArrayList<>(lista.subList(a, b))
      */
     public static <T> List<T> mergeSort(List<T> lista, Comparator<? super T> comparador) {
-        // TODO
-        throw new UnsupportedOperationException("TODO: Ordenacao.mergeSort()");
+        if (lista.size() <= 1) {
+            return new ArrayList<>(lista);
+        }
+
+        int meio = lista.size() / 2;
+        List<T> esquerda = mergeSort(lista.subList(0, meio), comparador);
+        List<T> direita = mergeSort(lista.subList(meio, lista.size()), comparador);
+
+        return intercalar(esquerda, direita, comparador);
     }
 
-    /**
-     * Intercala duas listas JÁ ORDENADAS em uma única lista ordenada.
-     * Use "<= 0" ao comparar para manter a ESTABILIDADE (empates preservam a ordem original).
-     *
-     * TODO [Etapa 5]: dois índices (i para esquerda, j para direita); enquanto ambos
-     * tiverem elementos, copie o menor; ao final, copie o que sobrou de cada lado.
-     */
-    static <T> List<T> intercalar(List<T> esquerda, List<T> direita, Comparator<? super T> comparador) {
+    static <T> List<T> intercalar(
+            List<T> esquerda, List<T> direita, Comparator<? super T> comparador) {
+
         List<T> resultado = new ArrayList<>(esquerda.size() + direita.size());
-        // TODO
-        throw new UnsupportedOperationException("TODO: Ordenacao.intercalar()");
-    }
+        int i = 0;
+        int j = 0;
 
-    /**
-     * INSERTION SORT (iterativo, O(n²)) — JÁ IMPLEMENTADO como referência.
-     * Compare com o merge sort: qual é mais rápido para 10 elementos? E para 100.000?
-     */
+        while (i < esquerda.size() && j < direita.size()) {
+            if (comparador.compare(esquerda.get(i), direita.get(j)) <= 0) {
+                resultado.add(esquerda.get(i));
+                i++;
+            } else {
+                resultado.add(direita.get(j));
+                j++;
+            }
+        }
+
+        resultado.addAll(esquerda.subList(i, esquerda.size()));
+        resultado.addAll(direita.subList(j, direita.size()));
+        return resultado;
+    }
     public static <T> List<T> insertionSort(List<T> lista, Comparator<? super T> comparador) {
         List<T> copia = new ArrayList<>(lista);
         for (int i = 1; i < copia.size(); i++) {

@@ -39,41 +39,31 @@ public class Paciente extends Pessoa implements Comparable<Paciente> {
      * Dica: String.format("P%03d", senha)
      */
     public String getSenhaFormatada() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: Paciente.getSenhaFormatada()");
+        return String.format("P%03d", senha);
     }
 
-    /**
-     * Associa a triagem ao paciente e muda o status para AGUARDANDO_ATENDIMENTO.
-     * Regra: só pode ser chamado se o status atual for AGUARDANDO_TRIAGEM;
-     *        caso contrário lance IllegalStateException("Paciente já foi triado").
-     */
     public void registrarTriagem(Triagem triagem) {
-        // TODO
-        throw new UnsupportedOperationException("TODO: Paciente.registrarTriagem()");
+        if (status != StatusPaciente.AGUARDANDO_TRIAGEM) {
+            throw new IllegalStateException("Paciente já foi triado");
+        }
+        this.triagem = triagem;
+        status = StatusPaciente.AGUARDANDO_ATENDIMENTO;
     }
 
-    /**
-     * Muda o status para ATENDIDO.
-     * Regra: só pode ser chamado se o status for AGUARDANDO_ATENDIMENTO;
-     *        caso contrário lance IllegalStateException.
-     */
     public void marcarComoAtendido() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: Paciente.marcarComoAtendido()");
+        if (status != StatusPaciente.AGUARDANDO_ATENDIMENTO) {
+            throw new IllegalStateException("Paciente não está aguardando atendimento");
+        }
+        status = StatusPaciente.ATENDIDO;
     }
 
-    /** Prioridade da triagem, ou null se ainda não foi triado. */
     public Prioridade getPrioridade() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: Paciente.getPrioridade()");
+        return triagem == null ? null : triagem.getPrioridade();
     }
 
-    /** Formato: "Paciente <nome> (senha P007)". */
     @Override
     public String getIdentificacao() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: Paciente.getIdentificacao()");
+        return "Paciente " + getNome() + " (senha " + getSenhaFormatada() + ")";
     }
 
     /**

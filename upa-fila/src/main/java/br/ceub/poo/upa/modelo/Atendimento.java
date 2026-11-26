@@ -25,19 +25,12 @@ public class Atendimento {
     public Medico getMedico() { return medico; }
     public LocalDateTime getHorarioChamada() { return horarioChamada; }
 
-    /**
-     * Minutos entre a CHEGADA do paciente e a CHAMADA pelo médico.
-     * Dica: Duration.between(inicio, fim).toMinutes()
-     */
     public long getTempoEsperaMin() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: Atendimento.getTempoEsperaMin()");
+        return Duration.between(paciente.getHorarioChegada(), horarioChamada).toMinutes();
     }
 
-    /** true se o tempo de espera NÃO ultrapassou o tempo máximo da prioridade do paciente. */
     public boolean isDentroDoPrazo() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: Atendimento.isDentroDoPrazo()");
+        return getTempoEsperaMin() <= paciente.getPrioridade().getTempoMaximoEsperaMin();
     }
 
     @Override

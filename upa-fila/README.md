@@ -1,11 +1,8 @@
-# 🏥 [NOME DA APLICAÇÃO]
-
-> ✏️ **Preencha TODOS os campos entre colchetes `[ ]` e apague estas linhas de instrução antes de entregar.**
-> Este arquivo é **obrigatório** e faz parte da nota (ver barema).
+# UPA Fila — Sistema de Gestão de Fila de Pacientes
 
 **Disciplina:** Programação Orientada a Objetos — UniCEUB
 **Professor:** Prof. Romes Heriberto
-**Turma:** Turma B - 0926 |  **Data de entrega:** [29/11/2026]
+**Turma:** Turma B - 0926 |  **Data de entrega:** 29/11/2026
 
 ---
 
@@ -13,15 +10,14 @@
 
 | Nome completo | Matrícula | Principais contribuições |
 |---|---|--------------------------|
-| [Marcos Paulo dos Santos Júnior] | [72650390] | [Toda a implementação]                 |
-
+| Marcos Paulo dos Santos Júnior | 72650390 | Implementei a validação de CPF, a identificação de pacientes e profissionais, as transições de status do paciente e o cálculo da espera. Na Etapa 4, implementei a classificação de risco, os critérios de desempate entre pacientes, a fila de prioridade e a pilha. |
 ---
 
 ## 📋 Descrição da aplicação
 
-[Em 1 ou 2 parágrafos: o que o sistema faz, para quem serve e qual problema resolve.
-Ex.: "Sistema de linha de comando que gerencia o fluxo de pacientes de uma UPA 24h, desde a
-recepção até a chamada médica, classificando o risco pelo Protocolo de Manchester simplificado..."]
+UPA Fila é uma aplicação acadêmica de terminal desenvolvida em Java para simular o fluxo de pacientes em uma Unidade de Pronto Atendimento. O projeto representa a chegada, a triagem e a chamada médica. A triagem usa cinco níveis de risco definidos pelo protocolo didático da atividade.
+
+A fila de atendimento considera primeiro a gravidade. Quando dois pacientes têm a mesma prioridade, a ordem depende do horário de chegada e, se esse horário também coincidir, do número da senha.
 
 ### Funcionalidades
 
@@ -90,8 +86,15 @@ java -jar target/upa-fila-1.0.jar
 mvn test
 ```
 
-Resultado obtido pelo grupo: **[__] testes, [__] passando, [__] falhando.**
+Resultados por etapa, obtidos no IntelliJ com os testes fornecidos no projeto.
 
+| Etapa | Teste | Resultado |
+|---|---|---|
+| 1 | `ValidadorCpfTest` | 5 de 5 aprovados |
+| 3 | `PacienteTest.senhaFormatadaTemTresDigitos` | 1 de 1 aprovado |
+| 4 | `ClassificadorManchesterSimplificadoTest` | 6 de 6 aprovados |
+| 4 | `FilaPrioridadeTest` | 5 de 5 aprovados |
+| 4 | `PilhaTest` | 2 de 2 aprovados |
 ---
 
 ## 🎬 Roteiro de demonstração
@@ -109,21 +112,18 @@ Resultado obtido pelo grupo: **[__] testes, [__] passando, [__] falhando.**
 
 ## 🧩 Conceitos de POO aplicados
 
-> Indique **onde** (classe e método) cada conceito aparece no **seu** código.
+
 
 | Conceito | Onde aparece |
 |---|---|
-| Encapsulamento | [ex.: `Paciente` — status só muda via `registrarTriagem()`] |
-| Herança | [...] |
-| Classe abstrata | [...] |
-| Interface | [...] |
-| Polimorfismo | [...] |
-| Composição | [...] |
-| Exceções personalizadas | [...] |
-| Recursão | [...] |
-| Estruturas de dados | [...] |
-| Padrões de projeto | [...] |
-| Princípios SOLID | [...] |
+| Encapsulamento | `Paciente` mantém o status privado. `registrarTriagem()` e `marcarComoAtendido()` verificam o estado atual antes de alterá-lo. |
+| Herança | `Paciente` estende `Pessoa`. `Medico` e `Enfermeiro` estendem `Profissional` e recebem nome e registro de conselho pela hierarquia. |
+| Classe abstrata | `Pessoa` reúne os dados comuns e declara o método abstrato `getIdentificacao()`. |
+| Interface | `Paciente` implementa `Comparable<Paciente>`. O método `compareTo()` define a ordem por prioridade, chegada e senha. |
+| Polimorfismo | Na verificação manual da Etapa 3, a chamada `getIdentificacao()` por uma referência `Pessoa` produziu a identificação específica de paciente, médico e enfermeiro. |
+| Composição | `Paciente` guarda a `Triagem` recebida em `registrarTriagem()`. Cada `Atendimento` associa um paciente ao médico que o chamou. |
+| Exceções personalizadas | `FilaPrioridade.espiar()` e `Pilha.topo()` lançam `FilaVaziaException` quando a estrutura está vazia. |
+| Estruturas de dados | `FilaPrioridade.enfileirar()` insere cada nó na posição ordenada. `Pilha.empilhar()` e `desempilhar()` operam no topo, de modo que o último elemento inserido é o primeiro a sair. |
 
 ---
 

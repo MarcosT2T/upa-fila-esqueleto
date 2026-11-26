@@ -1,7 +1,7 @@
 package br.ceub.poo.upa.estrutura;
 
 import br.ceub.poo.upa.excecao.FilaVaziaException;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,37 +35,54 @@ public class FilaPrioridade<T extends Comparable<T>> implements Colecao<T> {
     private int tamanho;
 
     public void enfileirar(T valor) {
-        // TODO
-        throw new UnsupportedOperationException("TODO: FilaPrioridade.enfileirar()");
+        No<T> novo = new No<>(valor);
+
+        if (inicio == null || valor.compareTo(inicio.valor) < 0) {
+            novo.proximo = inicio;
+            inicio = novo;
+        } else {
+            No<T> atual = inicio;
+            while (atual.proximo != null
+                    && atual.proximo.valor.compareTo(valor) <= 0) {
+                atual = atual.proximo;
+            }
+            novo.proximo = atual.proximo;
+            atual.proximo = novo;
+        }
+
+        tamanho++;
     }
 
-    /** Remove e devolve o elemento MAIS prioritário. Lança FilaVaziaException se vazia. */
     public T desenfileirar() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: FilaPrioridade.desenfileirar()");
+        T valor = espiar();
+        inicio = inicio.proximo;
+        tamanho--;
+        return valor;
     }
 
-    /** Devolve (sem remover) o elemento MAIS prioritário. Lança FilaVaziaException se vazia. */
     public T espiar() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: FilaPrioridade.espiar()");
+        if (estaVazia()) {
+            throw new FilaVaziaException("A fila está vazia");
+        }
+        return inicio.valor;
     }
 
     @Override
     public int tamanho() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: FilaPrioridade.tamanho()");
+        return tamanho;
     }
 
     @Override
     public boolean estaVazia() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: FilaPrioridade.estaVazia()");
+        return tamanho == 0;
     }
 
     @Override
     public List<T> paraLista() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: FilaPrioridade.paraLista()");
+        List<T> lista = new ArrayList<>();
+        for (No<T> atual = inicio; atual != null; atual = atual.proximo) {
+            lista.add(atual.valor);
+        }
+        return lista;
     }
 }

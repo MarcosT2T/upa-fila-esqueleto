@@ -5,19 +5,15 @@
 
 **Disciplina:** Programação Orientada a Objetos — UniCEUB
 **Professor:** Prof. Romes Heriberto
-**Turma:** [turma]  |  **Data de entrega:** [dd/mm/aaaa]
+**Turma:** Turma B - 0926 |  **Data de entrega:** [29/11/2026]
 
 ---
 
 ## 👥 Integrantes
 
 | Nome completo | Matrícula | Principais contribuições |
-|---|---|---|
-| [Nome do integrante 1] | [000000000] | [ex.: FilaPrioridade, testes de estrutura] |
-| [Nome do integrante 2] | [000000000] | [ex.: ClassificadorManchester, MenuCli] |
-| [Nome do integrante 3] | [000000000] | [...] |
-
-> Trabalho individual? Mantenha só uma linha.
+|---|---|--------------------------|
+| [Marcos Paulo dos Santos Júnior] | [72650390] | [Toda a implementação]                 |
 
 ---
 

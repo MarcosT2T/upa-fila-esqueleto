@@ -21,13 +21,13 @@ A fila de atendimento considera primeiro a gravidade. Quando dois pacientes têm
 
 ### Funcionalidades
 
-- [ ] RF01 — Cadastro de paciente com validação de CPF e geração de senha
-- [ ] RF02 — Triagem com classificação de risco (5 cores)
-- [ ] RF03 — Chamada do próximo paciente por prioridade, com painel de chamada
-- [ ] RF04 — Visualização das filas de triagem e de atendimento
-- [ ] RF05 — Busca de paciente por CPF e por senha (busca binária)
-- [ ] RF06 — Relatórios: últimos atendimentos (pilha) e ordenado por espera (merge sort)
-- [ ] RF07 — Estatísticas do plantão
+- [X] RF01 — Cadastro de paciente com validação de CPF e geração de senha
+- [X] RF02 — Triagem com classificação de risco (5 cores)
+- [X] RF03 — Chamada do próximo paciente por prioridade, com painel de chamada
+- [X] RF04 — Visualização das filas de triagem e de atendimento
+- [X] RF05 — Busca de paciente por CPF e por senha (busca binária)
+- [X] RF06 — Relatórios: últimos atendimentos (pilha) e ordenado por espera (merge sort)
+- [X] RF07 — Estatísticas do plantão
 - [ ] Bônus: [descreva, se fez]
 
 > Marque com `[x]` o que está **funcionando**.
@@ -100,6 +100,8 @@ Resultados por etapa, obtidos no IntelliJ com os testes fornecidos no projeto.
 | 6 | `UpaServiceTest` | 6 de 6 aprovados |
 | 6 | Suíte completa fornecida pelo professor | 33 de 33 aprovados |
 | 7 | Demonstração manual da CLI | Opções 1 a 7 verificadas com dois pacientes. Conferi a chamada por prioridade, as buscas, os relatórios, as estatísticas e o retorno ao menu após entradas inválidas ou fila vazia. |
+| 8 | `PacienteTest` e `SinaisVitaisTest` | 8 testes novos: atendimento antes da triagem, validação dos sinais vitais e aceitação da dor no limite superior. |
+| 8 | Suíte completa | 41 de 41 aprovados: 33 testes originais e 8 acrescentados na Etapa 8. |
 ---
 
 ## 🎬 Roteiro de demonstração

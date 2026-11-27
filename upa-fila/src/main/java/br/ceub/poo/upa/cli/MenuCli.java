@@ -105,39 +105,44 @@ public class MenuCli {
 
     // ---------------------------------------------------------------- 2
 
-    /**
-     * TODO [Etapa 7]:
-     *  1. Mostre quem é o próximo: servico.proximoParaTriagem().getIdentificacao()
-     *  2. Leia a queixa principal (lerTexto)
-     *  3. Leia os sinais vitais: temperatura (lerDecimal), FC, PA sistólica, PA diastólica,
-     *     SpO2 e dor (lerInteiro com faixas coerentes) e consciente (lerSimNao)
-     *  4. new SinaisVitais(...)  → pode lançar SinaisVitaisInvalidosException (é UpaException:
-     *     o laço de iniciar() já trata; o paciente continua na fila)
-     *  5. Triagem t = servico.triarProximo(enfermeiroPlantao, sinais, queixa)
-     *  6. Mostre a cor e o tempo máximo de espera: t.getPrioridade()
-     */
     private void realizarTriagem() throws UpaException {
         System.out.println("\n--- TRIAGEM (" + enfermeiroPlantao.getIdentificacao() + ") ---");
-        // TODO
-        throw new UnsupportedOperationException("MenuCli.realizarTriagem()");
+        Paciente paciente = servico.proximoParaTriagem();
+        System.out.println("Próximo: " + paciente.getIdentificacao());
+
+        String queixa = console.lerTexto("Queixa principal");
+        double temperatura = console.lerDecimal("Temperatura (°C)");
+        int frequencia = console.lerInteiro("Frequência cardíaca", 20, 250);
+        int sistolica = console.lerInteiro("PA sistólica", 40, 300);
+        int diastolica = console.lerInteiro("PA diastólica", 20, 200);
+        int saturacao = console.lerInteiro("Saturação O2 (%)", 50, 100);
+        int dor = console.lerInteiro("Dor", 0, 10);
+        boolean consciente = console.lerSimNao("Consciente?");
+
+        // Se os sinais forem inválidos, o paciente continua aguardando triagem.
+        SinaisVitais sinais = new SinaisVitais(
+                temperatura, frequencia, sistolica, diastolica, saturacao, dor, consciente);
+        Triagem triagem = servico.triarProximo(enfermeiroPlantao, sinais, queixa);
+
+        System.out.println("[OK] Classificação: " + triagem.getPrioridade());
     }
 
     // ---------------------------------------------------------------- 3
 
-    /**
-     * TODO [Etapa 7]:
-     *  1. Liste os médicos de plantão numerados (1..n) com getIdentificacao()
-     *  2. Leia a escolha com lerInteiro(…, 1, medicosPlantao.size())
-     *  3. Atendimento a = servico.chamarProximo(medicoEscolhido)
-     *     (o PainelChamada — observador — imprime o painel sozinho!)
-     *  4. Mostre o tempo de espera e se foi dentro do prazo da cor.
-     */
     private void chamarProximo() {
         System.out.println("\n--- CHAMAR PRÓXIMO PACIENTE ---");
-        // TODO
-        throw new UnsupportedOperationException("MenuCli.chamarProximo()");
-    }
+        for (int i = 0; i < medicosPlantao.size(); i++) {
+            System.out.printf("%d. %s%n", i + 1, medicosPlantao.get(i).getIdentificacao());
+        }
 
+        int escolha = console.lerInteiro("Médico de plantão", 1, medicosPlantao.size());
+        Medico medico = medicosPlantao.get(escolha - 1);
+
+        // O serviço aciona o painel de chamada ao registrar o atendimento.
+        Atendimento atendimento = servico.chamarProximo(medico);
+        System.out.printf("Tempo de espera: %d min%n", atendimento.getTempoEsperaMin());
+        System.out.println("Dentro do prazo: " + (atendimento.isDentroDoPrazo() ? "Sim" : "Não"));
+    }
     // ---------------------------------------------------------------- 4 (JÁ IMPLEMENTADO: modelo)
 
     private void exibirFilas() {
@@ -166,39 +171,59 @@ public class MenuCli {
 
     // ---------------------------------------------------------------- 5
 
-    /**
-     * TODO [Etapa 7]: pergunte "1-CPF / 2-Senha"; chame servico.buscarPorCpf(...) ou
-     * servico.buscarPorSenha(...) e exiba: identificação, idade, status e, se houver, a triagem.
-     */
     private void buscarPaciente() throws UpaException {
         System.out.println("\n--- BUSCAR PACIENTE ---");
-        // TODO
-        throw new UnsupportedOperationException("MenuCli.buscarPaciente()");
-    }
+        int escolha = console.lerInteiro("Buscar por 1-CPF ou 2-Senha", 1, 2);
 
+        Paciente paciente;
+        if (escolha == 1) {
+            paciente = servico.buscarPorCpf(console.lerTexto("CPF"));
+        } else {
+            int senha = console.lerInteiro("Número da senha", 1, Integer.MAX_VALUE);
+            paciente = servico.buscarPorSenha(senha);
+        }
+
+        System.out.println(paciente.getIdentificacao());
+        System.out.println("Idade: " + paciente.getIdade() + " anos");
+        System.out.println("Status: " + paciente.getStatus());
+
+        if (paciente.getTriagem() != null) {
+            System.out.println("Triagem: " + paciente.getTriagem());
+        }
+    }
     // ---------------------------------------------------------------- 6
 
-    /**
-     * TODO [Etapa 7]: pergunte "1-Últimos 5 atendimentos / 2-Ordenado por tempo de espera";
-     * use servico.ultimosAtendimentos(5) ou servico.relatorioPorTempoEspera() e imprima cada
-     * Atendimento (o toString() já está pronto).
-     */
     private void exibirRelatorios() {
-        System.out.println("\n--- RELATÓRIOS ---");
-        // TODO
-        throw new UnsupportedOperationException("MenuCli.exibirRelatorios()");
-    }
+        System.out.println("\n--- RELATÓRIOS DE ATENDIMENTO ---");
+        System.out.println("1. Últimos 5 atendimentos");
+        System.out.println("2. Todos os atendimentos por tempo de espera");
+        int escolha = console.lerInteiro("Relatório", 1, 2);
 
+        List<Atendimento> atendimentos = escolha == 1
+                ? servico.ultimosAtendimentos(5)
+                : servico.relatorioPorTempoEspera();
+
+        if (atendimentos.isEmpty()) {
+            System.out.println("Nenhum atendimento registrado.");
+            return;
+        }
+
+        for (Atendimento atendimento : atendimentos) {
+            System.out.println(atendimento);
+        }
+    }
     // ---------------------------------------------------------------- 7
 
-    /**
-     * TODO [Etapa 7]: imprima, para cada Prioridade, a quantidade (servico.contarPorPrioridade())
-     * e uma "barra" de asteriscos proporcional (ex.: AMARELO  | *** 3), e o tempo médio de espera
-     * com 1 casa decimal (servico.tempoMedioEsperaMin()).
-     */
     private void exibirEstatisticas() {
         System.out.println("\n--- ESTATÍSTICAS DO PLANTÃO ---");
-        // TODO
-        throw new UnsupportedOperationException("MenuCli.exibirEstatisticas()");
+        Map<Prioridade, Integer> contagem = servico.contarPorPrioridade();
+
+        for (Prioridade prioridade : Prioridade.values()) {
+            int quantidade = contagem.get(prioridade);
+            System.out.printf("%-8s | %-10s %d%n",
+                    prioridade.name(), "*".repeat(quantidade), quantidade);
+        }
+
+        System.out.printf("Tempo médio de espera: %.1f min%n", servico.tempoMedioEsperaMin());
     }
 }

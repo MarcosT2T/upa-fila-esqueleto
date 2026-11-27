@@ -99,6 +99,7 @@ Resultados por etapa, obtidos no IntelliJ com os testes fornecidos no projeto.
 | 5 | `OrdenacaoTest` | 5 de 5 aprovados |
 | 6 | `UpaServiceTest` | 6 de 6 aprovados |
 | 6 | Suíte completa fornecida pelo professor | 33 de 33 aprovados |
+| 7 | Demonstração manual da CLI | Opções 1 a 7 verificadas com dois pacientes. Conferi a chamada por prioridade, as buscas, os relatórios, as estatísticas e o retorno ao menu após entradas inválidas ou fila vazia. |
 ---
 
 ## 🎬 Roteiro de demonstração

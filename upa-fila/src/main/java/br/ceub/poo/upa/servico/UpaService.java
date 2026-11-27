@@ -33,10 +33,8 @@ import java.util.Map;
 
 /**
  * CORAÇÃO DO SISTEMA: regras de negócio do fluxo da UPA.
- *
  *   chegada ──► [Fila de TRIAGEM (FIFO)] ──► triagem ──► [Fila de ATENDIMENTO (prioridade)]
  *           ──► chamada pelo médico ──► [Pilha de HISTÓRICO]
- *
  * <p>SOLID – SRP: esta classe NÃO lê teclado nem imprime na tela (isso é do {@code MenuCli}).
  * Ela só aplica regras. Por isso pode ser testada com JUnit.</p>
  * <p>SOLID – DIP / Injeção de dependência: classificador, repositório e relógio chegam
@@ -60,66 +58,49 @@ public class UpaService {
         this.relogio = relogio;
     }
 
-    // ================================================================ RF01 — CADASTRO
-
-    /**
-     * Cadastra o paciente na chegada e o coloca na FILA DE TRIAGEM.
-     *
-     * TODO [Etapa 6]:
-     *  1. Se !ValidadorCpf.isValido(cpf) → throw new CpfInvalidoException(cpf)
-     *  2. cpfNormalizado = ValidadorCpf.normalizar(cpf)
-     *  3. Se repositorio.buscarPorCpf(cpfNormalizado) encontrar paciente com status
-     *     DIFERENTE de ATENDIDO → throw new PacienteDuplicadoException(cpfNormalizado)
-     *  4. Crie o Paciente com geradorSenha.proxima() e LocalDateTime.now(relogio)
-     *  5. repositorio.salvar(...) e filaTriagem.enfileirar(...)
-     *  6. Retorne o paciente criado.
-     */
     public Paciente cadastrarPaciente(String nome, String cpf, LocalDate dataNascimento)
             throws CpfInvalidoException, PacienteDuplicadoException {
-        // TODO
-        throw new UnsupportedOperationException("TODO: UpaService.cadastrarPaciente()");
+        if (!ValidadorCpf.isValido(cpf)) {
+            throw new CpfInvalidoException(cpf);
+        }
+
+        String cpfNormalizado = ValidadorCpf.normalizar(cpf);
+        var anterior = repositorio.buscarPorCpf(cpfNormalizado);
+
+        if (anterior.isPresent() && anterior.get().getStatus() != StatusPaciente.ATENDIDO) {
+            throw new PacienteDuplicadoException(cpfNormalizado);
+        }
+        // Só geramos a senha depois de conferir o CPF. Assim, um cadastro recusado não consome um número.
+        Paciente paciente = new Paciente(nome, cpfNormalizado, dataNascimento,
+                geradorSenha.proxima(), LocalDateTime.now(relogio));
+        repositorio.salvar(paciente);
+        filaTriagem.enfileirar(paciente);
+        return paciente;
     }
 
-    // ================================================================ RF02 — TRIAGEM
-
-    /** Próximo paciente a ser triado, SEM removê-lo (para a tela mostrar quem é). JÁ IMPLEMENTADO. */
-    public Paciente proximoParaTriagem() {
-        return filaTriagem.espiar(); // FilaVaziaException se não houver ninguém
-    }
-
-    /**
-     * Realiza a triagem do PRÓXIMO da fila de triagem.
-     *
-     * TODO [Etapa 6]:
-     *  1. prioridade = classificador.classificar(sinais)        ← POLIMORFISMO via interface
-     *  2. paciente = filaTriagem.desenfileirar()
-     *  3. triagem = new Triagem(enfermeiro, sinais, prioridade, queixa, LocalDateTime.now(relogio))
-     *  4. paciente.registrarTriagem(triagem)
-     *  5. filaAtendimento.enfileirar(paciente)
-     *  6. return triagem
-     *  ATENÇÃO: classifique ANTES de desenfileirar — se algo falhar, o paciente não "some" da fila.
-     */
     public Triagem triarProximo(Enfermeiro enfermeiro, SinaisVitais sinais, String queixa) {
-        // TODO
-        throw new UnsupportedOperationException("TODO: UpaService.triarProximo()");
+        // Se a classificação falhar, o paciente continua na fila de triagem.
+        Prioridade prioridade = classificador.classificar(sinais);
+        Paciente paciente = filaTriagem.desenfileirar();
+
+        Triagem triagem = new Triagem(enfermeiro, sinais, prioridade, queixa,
+                LocalDateTime.now(relogio));
+        paciente.registrarTriagem(triagem);
+        filaAtendimento.enfileirar(paciente);
+        return triagem;
     }
 
-    // ================================================================ RF03 — CHAMADA
-
-    /**
-     * Chama o paciente MAIS PRIORITÁRIO para o médico informado.
-     *
-     * TODO [Etapa 6]:
-     *  1. paciente = filaAtendimento.desenfileirar()
-     *  2. paciente.marcarComoAtendido()
-     *  3. atendimento = new Atendimento(paciente, medico, LocalDateTime.now(relogio))
-     *  4. historico.empilhar(atendimento)
-     *  5. Avise TODOS os observadores: for (ObservadorChamada o : observadores) o.aoChamarPaciente(atendimento);
-     *  6. return atendimento
-     */
     public Atendimento chamarProximo(Medico medico) {
-        // TODO
-        throw new UnsupportedOperationException("TODO: UpaService.chamarProximo()");
+        Paciente paciente = filaAtendimento.desenfileirar();
+        paciente.marcarComoAtendido();
+
+        Atendimento atendimento = new Atendimento(paciente, medico, LocalDateTime.now(relogio));
+        historico.empilhar(atendimento);
+
+        for (ObservadorChamada observador : observadores) {
+            observador.aoChamarPaciente(atendimento);
+        }
+        return atendimento;
     }
 
     public void adicionarObservador(ObservadorChamada observador) {
@@ -138,68 +119,68 @@ public class UpaService {
 
     // ================================================================ RF05 — BUSCAS
 
-    /** Busca por CPF (sequencial, dentro do repositório). JÁ IMPLEMENTADO como modelo. */
+    /**
+     * Busca por CPF (sequencial, dentro do repositório). JÁ IMPLEMENTADO como modelo.
+     */
     public Paciente buscarPorCpf(String cpf) throws PacienteNaoEncontradoException {
         String cpfNormalizado = ValidadorCpf.normalizar(cpf);
         return repositorio.buscarPorCpf(cpfNormalizado)
                 .orElseThrow(() -> new PacienteNaoEncontradoException(cpf));
     }
 
-    /**
-     * Busca por número de senha usando BUSCA BINÁRIA.
-     *
-     * TODO [Etapa 6]:
-     *  1. todos = repositorio.listarTodos()   (já vem ordenado por senha)
-     *  2. indice = Busca.buscaBinaria(todos, senha, Paciente::getSenha)
-     *  3. Se indice == -1 → throw new PacienteNaoEncontradoException("senha " + senha)
-     *  4. return todos.get(indice)
-     */
     public Paciente buscarPorSenha(int senha) throws PacienteNaoEncontradoException {
-        // TODO
-        throw new UnsupportedOperationException("TODO: UpaService.buscarPorSenha()");
+        List<Paciente> pacientes = repositorio.listarTodos();
+        int indice = Busca.buscaBinaria(pacientes, senha, Paciente::getSenha);
+
+        if (indice == -1) {
+            throw new PacienteNaoEncontradoException("senha " + senha);
+        }
+        return pacientes.get(indice);
     }
 
     // ================================================================ RF06 — RELATÓRIOS
 
-    /** Últimos n atendimentos, do mais recente para o mais antigo (vem da PILHA). JÁ IMPLEMENTADO. */
+    /**
+     * Últimos n atendimentos, do mais recente para o mais antigo (vem da PILHA). JÁ IMPLEMENTADO.
+     */
     public List<Atendimento> ultimosAtendimentos(int n) {
         List<Atendimento> todos = historico.paraLista();
         return todos.subList(0, Math.min(n, todos.size()));
     }
 
-    /**
-     * Todos os atendimentos ordenados do MAIOR para o MENOR tempo de espera.
-     *
-     * TODO [Etapa 6]: use Ordenacao.mergeSort(historico.paraLista(), comparador) com
-     *   Comparator.comparingLong(Atendimento::getTempoEsperaMin).reversed()
-     */
     public List<Atendimento> relatorioPorTempoEspera() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: UpaService.relatorioPorTempoEspera()");
+        return Ordenacao.mergeSort(historico.paraLista(),
+                Comparator.comparingLong(Atendimento::getTempoEsperaMin).reversed());
     }
 
-    // ================================================================ RF07 — ESTATÍSTICAS
-
-    /**
-     * Quantidade de pacientes JÁ TRIADOS por cor (inclui quem ainda espera e quem já foi atendido).
-     * Todas as 5 cores devem aparecer no mapa, mesmo com zero.
-     *
-     * TODO [Etapa 6]: EnumMap<Prioridade,Integer>; inicialize as 5 cores com 0 (for sobre
-     * Prioridade.values()) e percorra repositorio.listarTodos() somando quem tem triagem.
-     */
     public Map<Prioridade, Integer> contarPorPrioridade() {
         Map<Prioridade, Integer> contagem = new EnumMap<>(Prioridade.class);
-        // TODO
-        throw new UnsupportedOperationException("TODO: UpaService.contarPorPrioridade()");
+        for (Prioridade prioridade : Prioridade.values()) {
+            contagem.put(prioridade, 0);
+        }
+
+        for (Paciente paciente : repositorio.listarTodos()) {
+            Prioridade prioridade = paciente.getPrioridade();
+            if (prioridade != null) {
+                contagem.put(prioridade, contagem.get(prioridade) + 1);
+            }
+        }
+        return contagem;
     }
 
-    /**
-     * Média do tempo de espera (min) dos atendimentos realizados; 0.0 se não houver nenhum.
-     * TODO [Etapa 6]
-     */
     public double tempoMedioEsperaMin() {
-        // TODO
-        throw new UnsupportedOperationException("TODO: UpaService.tempoMedioEsperaMin()");
+        if (historico.estaVazia()) {
+            return 0.0;
+        }
+
+        long totalMinutos = 0;
+        for (Atendimento atendimento : historico.paraLista()) {
+            totalMinutos += atendimento.getTempoEsperaMin();
+        }
+        return (double) totalMinutos / historico.tamanho();
+    }
+    public Paciente proximoParaTriagem() {
+        return filaTriagem.espiar();
     }
 
     public String getNomeProtocolo() {

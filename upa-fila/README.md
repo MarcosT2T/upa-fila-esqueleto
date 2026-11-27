@@ -97,6 +97,8 @@ Resultados por etapa, obtidos no IntelliJ com os testes fornecidos no projeto.
 | 4 | `PilhaTest` | 2 de 2 aprovados |
 | 5 | `BuscaTest` | 2 de 2 aprovados |
 | 5 | `OrdenacaoTest` | 5 de 5 aprovados |
+| 6 | `UpaServiceTest` | 6 de 6 aprovados |
+| 6 | Suíte completa fornecida pelo professor | 33 de 33 aprovados |
 ---
 
 ## 🎬 Roteiro de demonstração
